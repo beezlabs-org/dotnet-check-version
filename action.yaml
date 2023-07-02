@@ -1,0 +1,11 @@
+name: .NET Check Version
+description: Action to check if a .NET projects's version strings are consistent
+runs:
+  using: composite
+  steps:
+    - run: |
+        echo "BEEZ_VERSION_FILE=$(cat VERSION)" >> $GITHUB_ENV
+        echo "BEEZ_ASSEMBLY_VERSION=$(find . -name "AssemblyInfo.cs" -exec cat {} + | grep -oP '(?<=^\[assembly: AssemblyVersion\(")[^"]*')" >> $GITHUB_ENV
+        echo "BEEZ_ASSEMBLY_FILE_VERSION=$(find . -name "AssemblyInfo.cs" -exec cat {} + | grep -oP '(?<=^\[assembly: AssemblyFileVersion\(")[^"]*')" >> $GITHUB_ENV
+        [[ "$BEEZ_VERSION_FILE" == "$BEEZ_ASSEMBLY_VERSION" && "$BEEZ_ASSEMBLY_VERSION" == "$BEEZ_ASSEMBLY_FILE_VERSION" ]]
+      shell: bash
