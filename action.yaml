@@ -3,9 +3,14 @@ description: Action to check if a .NET projects's version strings are consistent
 runs:
   using: composite
   steps:
-    - run: |
+    - name: Set Environment Variables from files
+      run: |
         echo "BEEZ_VERSION_FILE=$(cat VERSION)" >> $GITHUB_ENV
         echo "BEEZ_ASSEMBLY_VERSION=$(find . -name "AssemblyInfo.cs" -exec cat {} + | grep -oP '(?<=^\[assembly: AssemblyVersion\(")[^"]*')" >> $GITHUB_ENV
         echo "BEEZ_ASSEMBLY_FILE_VERSION=$(find . -name "AssemblyInfo.cs" -exec cat {} + | grep -oP '(?<=^\[assembly: AssemblyFileVersion\(")[^"]*')" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Check if version strings are consistent
+      run: |
         [[ "$BEEZ_VERSION_FILE" == "$BEEZ_ASSEMBLY_VERSION" && "$BEEZ_ASSEMBLY_VERSION" == "$BEEZ_ASSEMBLY_FILE_VERSION" ]]
       shell: bash
